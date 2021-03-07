@@ -41,8 +41,10 @@ router.post(
     async (req: any, res: Response): Promise<void> => {
         const { title, url, userId } = req.body;
         try {
-            await query(`INSERT INTO IMAGES(title, url, user_id) VALUES ('${title}', '${url}', ${userId});`);
-            res.send('Posted image successfully');
+            const postResult =  await query(
+                `INSERT INTO IMAGES(title, url, user_id) VALUES ('${title}', '${url}', ${userId}) RETURNING id;`
+            );
+            res.send(`Created image with id ${postResult.rows[0].id} successfully`);
         } catch (error: unknown) {
             console.error(error);
             res.send(JSON.stringify(error));
@@ -64,13 +66,21 @@ router.delete(
     }
 );
 
-// Put Request (change title or url)
+// Put Request (change title, url, or user id)
 router.put(
     '/id/:id',
     async (req: Request, res: Response): Promise<void> => {
         const id = req.params.id;
-        const { title, url } = req.body;
-        console.log(title, url);
+        const { title, url, userId } = req.body;
+        try {
+            await query(
+                `UPDATE IMAGES SET title = '${title}', url = '${url}', user_id = ${userId} WHERE id=${id};`
+            );
+            res.send('Edited image successfully');
+        } catch (error: unknown) {
+            console.error(error);
+            res.send(JSON.stringify(error));
+        }
     }
 );
 
