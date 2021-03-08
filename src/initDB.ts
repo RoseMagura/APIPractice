@@ -1,10 +1,6 @@
 import * as pg from 'pg';
 import * as dotenv from 'dotenv';
 import { Sequelize } from 'sequelize';
-import User from './models/User';
-import Image from './models/Image';
-import Comment from './models/Comment';
-import Like from './models/Like';
 
 dotenv.config();
 
@@ -73,51 +69,4 @@ const addImages = async (userId: number): Promise<void> => {
         });
     }
 };
-const createTables = async (): Promise<void> => {
-    // Create tables if they don't already exist
-    await Image.sync();
-    await User.sync();
-    await Like.sync();
-    await Comment.sync();
 
-    // Set up foreign key connections
-    User.hasMany(Comment, { foreignKey: { name: 'user_id' } });
-    User.hasMany(Like, { foreignKey: { name: 'user_id' } });
-
-    User.hasMany(Image, {
-        onDelete: 'CASCADE',
-        hooks: true,
-        foreignKey: { name: 'user_id' },
-    });
-    Image.hasMany(Comment, { foreignKey: { name: 'image_id' } });
-    Image.hasMany(Like, { foreignKey: { name: 'image_id' } });
-
-    // Force tables to update to have foreign keys
-    await Image.sync({ force: true });
-    await User.sync({ force: true });
-    await Like.sync({ force: true });
-    await Comment.sync({ force: true });
-};
-
-const createAdmin = async (): Promise<number> => {
-    const currUsers = await User.findAll();
-    if (currUsers.length === 0) {
-        const admin = await User.create({
-            username: 'admin',
-            password: process.env.PGPASSWORD,
-            first_name: 'admin',
-            last_name: 'user',
-            admin: true,
-        });
-        return admin.get()['id'];
-    } else {
-        return currUsers[0].get()['id'];
-    }
-};
-export const setUp = async (): Promise<void> => {
-    createTables().then(async () => {
-        createAdmin().then(async (id) => {
-            await addImages(id);
-        });
-    });
-};

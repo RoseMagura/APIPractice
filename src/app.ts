@@ -1,10 +1,6 @@
 import * as express from 'express';
 import * as cors from 'cors';
 import * as dotenv from 'dotenv';
-import {
-    setUp,
-    // testConnection
-} from './initDB';
 import imagesRouter from './routes/images';
 import docsRouter from './routes/docs';
 
@@ -20,6 +16,5 @@ app.use('/', imagesRouter);
 app.use('/api-docs', docsRouter);
 
 app.listen(port, (): void => {
-    setUp().catch((err) => console.error(err));
     console.log(`App listening at http://localhost:${port}`);
 });
