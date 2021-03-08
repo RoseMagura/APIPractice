@@ -1,6 +1,7 @@
 import * as pg from 'pg';
 import * as dotenv from 'dotenv';
 import { Sequelize, DataTypes } from 'sequelize';
+import User from './models/User';
 
 dotenv.config();
 
@@ -37,7 +38,7 @@ export const query = (statement: string): any => {
     }
 };
 
-const addImages = async(): Promise<void> => {
+const addImages = async (userId: number): Promise<void> => {
     const images = [
         [
             'Smoothie',
@@ -61,14 +62,14 @@ const addImages = async(): Promise<void> => {
         images.forEach(async (item) => {
             try {
                 await query(
-                    `INSERT INTO IMAGES (title, url) VALUES('${item[0]}', '${item[1]}');`
+                    `INSERT INTO IMAGES (title, url, user_id) VALUES('${item[0]}', '${item[1]}', ${userId});`
                 );
             } catch (error) {
                 console.error(error);
             }
         });
     }
-}
+};
 const createTables = async (): Promise<void> => {
     const Image = sequelize.define(
         'Image',
@@ -82,7 +83,7 @@ const createTables = async (): Promise<void> => {
         'User',
         {
             username: { type: DataTypes.STRING, allowNull: false },
-            passord: { type: DataTypes.STRING, allowNull: false },
+            password: { type: DataTypes.STRING, allowNull: false },
             first_name: { type: DataTypes.STRING, allowNull: false },
             last_name: { type: DataTypes.STRING, allowNull: false },
             admin: { type: DataTypes.BOOLEAN, defaultValue: false },
@@ -107,20 +108,37 @@ const createTables = async (): Promise<void> => {
     User.hasMany(Comment, { foreignKey: { name: 'user_id' } });
     User.hasMany(Like, { foreignKey: { name: 'user_id' } });
 
-    User.hasMany(Image, { foreignKey: { name: 'user_id' } });
+    User.hasMany(Image, {
+        onDelete: 'CASCADE',
+        hooks: true,
+        foreignKey: { name: 'user_id' },
+    });
     Image.hasMany(Comment, { foreignKey: { name: 'image_id' } });
     Image.hasMany(Like, { foreignKey: { name: 'image_id' } });
     /* Create tables if they don't already exist, but don't
     force the database drop and create existing tables */
     await sequelize.sync();
-
 };
 
-const createAdmin = async (): Promise<void> => {
-
-}
+const createAdmin = async (): Promise<number> => {
+    const currUsers = await User.findAll();
+    if (currUsers.length === 0) {
+        const admin = await User.create({
+            username: 'admin',
+            password: process.env.PGPASSWORD,
+            first_name: 'admin',
+            last_name: 'user',
+            admin: true,
+        });
+        return admin.get()['id'];
+    } else {
+        return currUsers[0].get()['id'];
+    }
+};
 export const setUp = async (): Promise<void> => {
-    await createTables();
-    await addImages();
-    // await createAdmin();
+    createTables().then(async () => {
+        createAdmin().then(async (id) => {
+            await addImages(id);
+        });
+    });
 };

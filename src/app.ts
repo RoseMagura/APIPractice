@@ -21,6 +21,5 @@ app.use('/api-docs', docsRouter);
 
 app.listen(port, (): void => {
     setUp().catch((err) => console.error(err));
-    // testConnection();
     console.log(`App listening at http://localhost:${port}`);
 });

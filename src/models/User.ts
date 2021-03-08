@@ -1,23 +1,28 @@
-import { DataTypes, Model } from 'sequelize';
-import { sequelize } from '../initDB';
+import { DataTypes, Model, Sequelize } from 'sequelize';
+import * as dotenv from 'dotenv';
 
+dotenv.config();
+
+const sequelize = new Sequelize(String(process.env.LOCAL_CONNECTION), {
+    define: {
+        timestamps: false,
+    },
+});
 class User extends Model {}
 
-User.init({
-    // Model attributes are defined here
-    firstName: {
-      type: DataTypes.STRING,
-      allowNull: false
+User.init(
+    {
+        username: { type: DataTypes.STRING, allowNull: false },
+        password: { type: DataTypes.STRING, allowNull: false },
+        first_name: { type: DataTypes.STRING, allowNull: false },
+        last_name: { type: DataTypes.STRING, allowNull: false },
+        admin: { type: DataTypes.BOOLEAN, defaultValue: false },
     },
-    lastName: {
-      type: DataTypes.STRING
-      // allowNull defaults to true
+    {
+        underscored: true,
+        sequelize,
+        modelName: 'User',
     }
-  }, {
-    // Other model options go here
-    sequelize, // We need to pass the connection instance
-    modelName: 'User' // We need to choose the model name
-  });
-  
-  // the defined model is the class itself
-console.log(User === sequelize.models.User);
+);
+
+export default User;
