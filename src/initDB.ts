@@ -1,7 +1,10 @@
 import * as pg from 'pg';
 import * as dotenv from 'dotenv';
-import { Sequelize, DataTypes } from 'sequelize';
+import { Sequelize } from 'sequelize';
 import User from './models/User';
+import Image from './models/Image';
+import Comment from './models/Comment';
+import Like from './models/Like';
 
 dotenv.config();
 
@@ -71,40 +74,13 @@ const addImages = async (userId: number): Promise<void> => {
     }
 };
 const createTables = async (): Promise<void> => {
-    const Image = sequelize.define(
-        'Image',
-        {
-            title: { type: DataTypes.STRING, allowNull: false },
-            url: { type: DataTypes.STRING, allowNull: false },
-        },
-        { underscored: true }
-    );
-    const User = sequelize.define(
-        'User',
-        {
-            username: { type: DataTypes.STRING, allowNull: false },
-            password: { type: DataTypes.STRING, allowNull: false },
-            first_name: { type: DataTypes.STRING, allowNull: false },
-            last_name: { type: DataTypes.STRING, allowNull: false },
-            admin: { type: DataTypes.BOOLEAN, defaultValue: false },
-        },
-        {
-            underscored: true,
-        }
-    );
-    const Comment = sequelize.define(
-        'Comment',
-        {
-            text: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
-        },
-        {
-            underscored: true,
-        }
-    );
-    const Like = sequelize.define('Like', {}, { tableName: 'likes' });
+    // Create tables if they don't already exist
+    await Image.sync();
+    await User.sync();
+    await Like.sync();
+    await Comment.sync();
+
+    // Set up foreign key connections
     User.hasMany(Comment, { foreignKey: { name: 'user_id' } });
     User.hasMany(Like, { foreignKey: { name: 'user_id' } });
 
@@ -115,9 +91,12 @@ const createTables = async (): Promise<void> => {
     });
     Image.hasMany(Comment, { foreignKey: { name: 'image_id' } });
     Image.hasMany(Like, { foreignKey: { name: 'image_id' } });
-    /* Create tables if they don't already exist, but don't
-    force the database drop and create existing tables */
-    await sequelize.sync();
+
+    // Force tables to update to have foreign keys
+    await Image.sync({ force: true });
+    await User.sync({ force: true });
+    await Like.sync({ force: true });
+    await Comment.sync({ force: true });
 };
 
 const createAdmin = async (): Promise<number> => {
