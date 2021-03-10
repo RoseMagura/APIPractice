@@ -8,7 +8,9 @@
     "start": "npm install && tsc && node ./dist/app.js",
     "prod": "tsc && node ./dist/app.js",
     "dev": "tsc-watch --onSuccess \"node ./dist/app.js\"",
-    "build": "tsc --project ./"
+    "build": "tsc --project ./",
+    "seeds": "npx sequelize-cli db:seed:all",
+    "migrate": "npx sequelize-cli db:migrate"
   },
   "repository": {
     "type": "git",
@@ -21,8 +23,10 @@
   },
   "homepage": "https://github.com/RoseMagura/CatAPI#readme",
   "devDependencies": {
+    "@types/bluebird": "^3.5.33",
     "@types/cors": "^2.8.10",
     "@types/express": "^4.17.11",
+    "@types/node": "^14.14.33",
     "@types/pg": "^7.14.10",
     "@types/swagger-jsdoc": "^6.0.0",
     "@types/swagger-ui-express": "^4.1.2",

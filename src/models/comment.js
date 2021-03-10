@@ -10,10 +10,10 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Comment.belongsTo(models.User, {
+      Comment.belongsTo(models.user, {
           foreignKey: 'userId',
       });
-      Comment.belongsTo(models.Image);
+      Comment.belongsTo(models.image);
     }
   };
   Comment.init({
@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     imageId: DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'Comment',
+    modelName: 'comment',
   });
   return Comment;
 };

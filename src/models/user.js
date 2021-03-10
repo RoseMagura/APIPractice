@@ -10,13 +10,13 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      User.hasMany(models.Image, {
+      User.hasMany(models.image, {
           foreignKey: 'userId'
       });
-      User.hasMany(models.Like, {
+      User.hasMany(models.like, {
           foreignKey: 'userId'
       });
-      User.hasMany(models.Comment, {
+      User.hasMany(models.comment, {
           foreignKey: 'userId'
       });
     }
@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
     admin: DataTypes.BOOLEAN
   }, {
     sequelize,
-    modelName: 'User',
+    modelName: 'user',
   });
   return User;
 };

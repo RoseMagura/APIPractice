@@ -1,6 +1,6 @@
 import * as pg from 'pg';
 import * as dotenv from 'dotenv';
-import { Sequelize } from 'sequelize';
+import { Sequelize, DataTypes } from 'sequelize';
 
 dotenv.config();
 
@@ -37,4 +37,41 @@ export const query = (statement: string): any => {
     }
 };
 
+export const createModels = async () => {
+    const Image = sequelize.define(
+        'Image',
+        {
+            title: { type: DataTypes.STRING, allowNull: false },
+            url: { type: DataTypes.STRING, allowNull: false },
+        }
+    );
+    const User = sequelize.define(
+        'User',
+        {
+            username: { type: DataTypes.STRING, allowNull: false },
+            passord: { type: DataTypes.STRING, allowNull: false },
+            firstName: { type: DataTypes.STRING, allowNull: false },
+            lastName: { type: DataTypes.STRING, allowNull: false },
+            admin: { type: DataTypes.BOOLEAN, defaultValue: false },
+        }
+    );
+    const Comment = sequelize.define(
+        'Comment',
+        {
+            text: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+        }
+    );
+    const Like = sequelize.define('Like', {}, {});
+    User.hasMany(Comment, { foreignKey: { name: 'userId' } });
+    User.hasMany(Like, { foreignKey: { name: 'userId' } });
 
+    User.hasMany(Image, { foreignKey: { name: 'userId' } });
+    Image.hasMany(Comment, { foreignKey: { name: 'imageId' } });
+    Image.hasMany(Like, { foreignKey: { name: 'imageId' } });
+    /* Create tables if they don't already exist, but don't
+    force the database drop and create existing tables */
+    await sequelize.sync();
+};

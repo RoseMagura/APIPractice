@@ -10,10 +10,10 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-        Like.belongsTo(models.User, {
+        Like.belongsTo(models.user, {
             foreignKey: 'userId',
         });
-        Like.belongsTo(models.Image);
+        Like.belongsTo(models.image);
     }
   };
   Like.init({
@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     imageId: DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'Like',
+    modelName: 'like',
   });
   return Like;
 };

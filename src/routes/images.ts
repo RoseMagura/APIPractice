@@ -1,6 +1,8 @@
 import * as express from 'express';
 import { Request, Response } from 'express';
 import { query } from '../initDB';
+// import * as Image from '../models/image';
+// import db from '../models/index';
 
 const router = express.Router();
 
@@ -13,6 +15,7 @@ router.get(
     '/all',
     async (req: Request, res: Response): Promise<void> => {
         try {
+            // console.log(Image.findAll());
             const all = await query('SELECT * FROM IMAGES;');
             res.send(all.rows);
         } catch (error: unknown) {
