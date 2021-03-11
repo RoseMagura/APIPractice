@@ -37,34 +37,36 @@ export const query = (statement: string): any => {
     }
 };
 
-export const createModels = async () => {
-    const Image = sequelize.define(
-        'Image',
-        {
-            title: { type: DataTypes.STRING, allowNull: false },
-            url: { type: DataTypes.STRING, allowNull: false },
-        }
-    );
-    const User = sequelize.define(
-        'User',
-        {
-            username: { type: DataTypes.STRING, allowNull: false },
-            passord: { type: DataTypes.STRING, allowNull: false },
-            firstName: { type: DataTypes.STRING, allowNull: false },
-            lastName: { type: DataTypes.STRING, allowNull: false },
-            admin: { type: DataTypes.BOOLEAN, defaultValue: false },
-        }
-    );
-    const Comment = sequelize.define(
-        'Comment',
-        {
-            text: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
-        }
-    );
-    const Like = sequelize.define('Like', {}, {});
+export const Image = sequelize.define(
+    'Image',
+    {
+        title: { type: DataTypes.STRING, allowNull: false },
+        url: { type: DataTypes.STRING, allowNull: false },
+    }
+);
+
+export const User = sequelize.define(
+    'User',
+    {
+        username: { type: DataTypes.STRING, allowNull: false },
+        passord: { type: DataTypes.STRING, allowNull: false },
+        firstName: { type: DataTypes.STRING, allowNull: false },
+        lastName: { type: DataTypes.STRING, allowNull: false },
+        admin: { type: DataTypes.BOOLEAN, defaultValue: false },
+    }
+);
+export const Comment = sequelize.define(
+    'Comment',
+    {
+        text: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+    }
+);
+export const Like = sequelize.define('Like', {}, {});
+
+export const createRelationships = async () => {
     User.hasMany(Comment, { foreignKey: { name: 'userId' } });
     User.hasMany(Like, { foreignKey: { name: 'userId' } });
 
