@@ -1,12 +1,19 @@
 import * as express from 'express';
 import { Request, Response } from 'express';
 import { Image } from '../initDB';
+import * as passport from 'passport';
+import { passportSetup } from '../auth/index';
+
+passportSetup();
 
 const router = express.Router();
+
+export const authOptions = passport.authenticate('basic', { session: false });
 
 router.get(
     '/all',
     async (req: Request, res: Response): Promise<void> => {
+        console.log(req.headers);
         try {
             const all = await Image.findAll();
             res.send(all);
@@ -33,8 +40,10 @@ router.get(
 
 router.post(
     '/',
+    authOptions,
     async (req: any, res: Response): Promise<void> => {
         const { title, url, userId } = req.body;
+        console.log(req.user);
         try {
             const postResult = await Image.create({
                 title,
@@ -53,6 +62,7 @@ router.post(
 
 router.delete(
     '/id/:id',
+    authOptions,
     async (req: Request, res: Response): Promise<void> => {
         const id = req.params.id;
         try {
@@ -74,6 +84,7 @@ router.delete(
 // Put Request (change title, url, or user id)
 router.put(
     '/id/:id',
+    authOptions,
     async (req: Request, res: Response): Promise<void> => {
         const id = req.params.id;
         // Note that the request body should contain all three
