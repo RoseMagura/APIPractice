@@ -4,11 +4,6 @@ import { Image } from '../initDB';
 
 const router = express.Router();
 
-// TODO: Add auth
-router.get('/', (req: Request, res: Response): void => {
-    res.send(JSON.stringify('Send a request to the backend'));
-});
-
 router.get(
     '/all',
     async (req: Request, res: Response): Promise<void> => {

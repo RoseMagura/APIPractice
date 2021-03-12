@@ -49,7 +49,7 @@ export const User = sequelize.define(
     'User',
     {
         username: { type: DataTypes.STRING, allowNull: false },
-        passord: { type: DataTypes.STRING, allowNull: false },
+        password: { type: DataTypes.STRING, allowNull: false },
         firstName: { type: DataTypes.STRING, allowNull: false },
         lastName: { type: DataTypes.STRING, allowNull: false },
         admin: { type: DataTypes.BOOLEAN, defaultValue: false },
