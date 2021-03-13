@@ -13,6 +13,16 @@ app.use(cors());
 app.use(passport.initialize());
 app.use(express.json());
 
+// make certain fields accessible through the Express version of user
+declare global {
+    namespace Express {
+        interface User {
+            id: string;
+            admin?: boolean;
+        }
+    }
+}
+
 const port = process.env.PORT || 3000;
 
 app.use(express.static('public'));

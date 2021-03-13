@@ -10,6 +10,15 @@ const router = express.Router();
 
 export const authOptions = passport.authenticate('basic', { session: false });
 
+// declare global {
+//     namespace Express {
+//         interface User {
+//             id: string;
+//             admin?: boolean;
+//         }
+//     }
+// }
+
 router.get(
     '/all',
     async (req: Request, res: Response): Promise<void> => {
@@ -43,7 +52,6 @@ router.post(
     authOptions,
     async (req: any, res: Response): Promise<void> => {
         const { title, url, userId } = req.body;
-        console.log(req.user);
         try {
             const postResult = await Image.create({
                 title,
@@ -65,15 +73,24 @@ router.delete(
     authOptions,
     async (req: Request, res: Response): Promise<void> => {
         const id = req.params.id;
+
         try {
             const image = await Image.findByPk(id);
             const name = image !== null && image.get('title');
-            await Image.destroy({
-                where: {
-                    id,
-                },
-            });
-            res.send(`Deleted ${name} successfully`);
+            // admin users can delete any images, but regular users
+            // can only delete their own images
+            if (req.user?.admin || image?.get('userId') === req.user?.id) {
+                await Image.destroy({
+                    where: {
+                        id,
+                    },
+                });
+                res.send(`Deleted ${name} successfully`);
+            } else {
+                res.send(
+                    "Can't delete: You can only delete others' images if you are an admin."
+                );
+            }
         } catch (error: unknown) {
             console.log(error);
             res.send(JSON.stringify(error));
@@ -90,6 +107,21 @@ router.put(
         // Note that the request body should contain all three
         const { title, url, userId } = req.body;
         try {
+            const image = await Image.findByPk(id);
+            // admin users can edit any images, but regular users
+            // can only edit their own images
+            if (req.user?.admin || image?.get('userId') === req.user?.id) {
+                await Image.destroy({
+                    where: {
+                        id,
+                    },
+                });
+                res.send(`Deleted ${name} successfully`);
+            } else {
+                res.send(
+                    "Can't delete: You can only edit others' images if you are an admin."
+                );
+            }
             await Image.update(
                 {
                     title,
